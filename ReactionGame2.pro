@@ -13,7 +13,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    PlayScreen.cpp
 
 HEADERS  += mainwindow.h \
     MainMenu.h \

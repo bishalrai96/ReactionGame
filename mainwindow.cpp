@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setFixedSize(800, 400);
 
     this->setStyleSheet("QMainWindow {background-color: #2359ab;}");
-
+  
     mCentralWidget = new QWidget(this);
     mVerticalLayout = new QVBoxLayout(mCentralWidget);
 
@@ -30,11 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     mCentralWidget->setLayout(mVerticalLayout);
     mCentralWidget->setFixedSize(800, 400);
-    mCentralWidget->show();
 
     connect(mPlayButton, SIGNAL(clicked()), this, SLOT(OpenGameScreen()));
     mPlayScreen = new GameScreen;
-
 }
 
 void MainWindow::OpenGameScreen() {
