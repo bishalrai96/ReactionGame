@@ -1,10 +1,13 @@
 #include "PlayScreen.h"
+#include "mainwindow.h"
 #include <stdlib.h>
 #include <QTimer>
+#include <QMouseEvent>
 
-GameScreen::GameScreen(QWidget * parent):QWidget(parent){
+GameScreen::GameScreen(QMainWindow * win, QWidget * parent):QWidget(parent){
 
-    this->setStyleSheet("background-color:#85e783;");
+    mMainWindow = win;
+    this->setStyleSheet("background-color:#2359ab;");
     this->setFixedSize(800, 400);
 
     QTimer * paint = new QTimer(this);
@@ -12,32 +15,52 @@ GameScreen::GameScreen(QWidget * parent):QWidget(parent){
     paint->setInterval(1000);
     paint->start();    
 
+    mHorizontalLayout = new QHBoxLayout(this);
+
+    mGoBack = new QPushButton("GO BACK", this);
+    mGoBack->setFixedSize(100, 50);
+    mGoBack->setStyleSheet("background-color:#e7efff;");
+    
+
+    mSelectLevel = new QPushButton("LEVEL", this);
+    mSelectLevel->setFixedSize(100, 50);
+    mSelectLevel->setStyleSheet("background-color:#e7efff;");
+
+    mShowScore = new QLabel("SCORE: 0", this);
+    mShowScore->setFixedSize(100, 50);
+    mShowScore->setStyleSheet("background-color:#e7efff;");
+    mShowScore->setAlignment(Qt::AlignCenter);
+
+    mHorizontalLayout->addWidget(mGoBack);
+    mHorizontalLayout->addWidget(mSelectLevel);
+    mHorizontalLayout->addWidget(mShowScore);
+
+    mHorizontalLayout->setAlignment(Qt::AlignBottom);
+    mHorizontalLayout->setSpacing(240);
+
+    connect(mGoBack, SIGNAL(clicked()), this, SLOT(OpenMainScreen()));
+
+    this->setAttribute(Qt::WA_DeleteOnClose);
+    
 }
 
 
 void GameScreen::paintEvent(QPaintEvent* event) {
-	
-    int maxRadius = 30;
-    int minRadius = 10;
-    int MaxLeftMargin = 800;
-    int MaxTopMargin = 400;
-    int marginLeft;
-    int marginTop;
-
-    int Diameter = rand() % maxRadius;
-    if (Diameter < 10) {
-        Diameter = 10;
+	  
+    mDiameter = rand() % mMaxCircleDiameter;
+    if (mDiameter < mMinCircleDiameter) {
+        mDiameter = mMinCircleDiameter;
     }
 
-    marginLeft = rand() % MaxLeftMargin;
-    marginTop  = rand() % MaxTopMargin;
-    if (marginLeft > MaxLeftMargin - Diameter)
-    	marginLeft = marginLeft - Diameter;
-    if (marginTop > MaxTopMargin - Diameter)
-    	marginTop  = marginTop - Diameter;
+    mMarginLeft = rand() % mMaxLeftMargin;
+    mMarginTop  = rand() % mMaxTopMargin;
+    if (mMarginLeft > mMaxLeftMargin - mDiameter)
+        mMarginLeft = mMarginLeft - mDiameter;
+    if (mMarginTop > mMaxTopMargin - mDiameter)
+        mMarginTop  = mMarginTop - mDiameter;
 
     (void)event;
-    QColor color = "#00cdaa";
+    QColor color = "#85e783";
     QBrush brush = QBrush(color);
     // setting widget to paint
     QPainter paint(this);
@@ -46,6 +69,34 @@ void GameScreen::paintEvent(QPaintEvent* event) {
     // setting the bursh color
     paint.setBrush(brush);
     // paint circle
-    paint.drawEllipse(marginLeft, marginTop, Diameter, Diameter);
+
+    paint.drawRect(0,0,mMaxLeftMargin,mMaxTopMargin);
+    QBrush brush2 = QBrush("#00cdaa");
+    color = "#00cdaa";
+    paint.setBrush(brush2);
+    paint.drawEllipse(mMarginLeft, mMarginTop, mDiameter, mDiameter);
 }
+
+void GameScreen::mousePressEvent(QMouseEvent *e) {
+	int x = e->x();
+	int y = e->y();
+
+    // check if user click is within the green frame
+    if (x < mMaxLeftMargin && y < mMaxTopMargin) {
+        // check if user has clicked the circle
+        if (x >= mMarginLeft && x <= mMarginLeft + mDiameter) {
+            if (y >= mMarginTop && y <= mMarginTop + mDiameter) {
+                mScore++;
+                mShowScore->setText("SCORE: " + QString::number(mScore));
+            }
+        }
+    }
+}
+
+void GameScreen::OpenMainScreen() {
+    this->close();
+    mMainWindow = new MainWindow();
+    mMainWindow->show();
+}
+
 

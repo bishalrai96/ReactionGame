@@ -31,13 +31,16 @@ MainWindow::MainWindow(QWidget *parent)
     mCentralWidget->setLayout(mVerticalLayout);
     mCentralWidget->setFixedSize(800, 400);
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     connect(mPlayButton, SIGNAL(clicked()), this, SLOT(OpenGameScreen()));
-    mPlayScreen = new GameScreen;
+
 }
 
 void MainWindow::OpenGameScreen() {
 
-    this->hide();
+    mPlayScreen = new GameScreen(this);
+    this->close();
     mPlayScreen->show();
 
 }
